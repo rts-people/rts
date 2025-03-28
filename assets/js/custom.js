@@ -48,6 +48,18 @@
     });
   }
 
+  // Menu Pop up Donasi
+  function setNominal(amount) {
+    document.getElementById("nominal").value = amount;
+  }
+  document.getElementById("donasiButton").addEventListener("click", function(event) {
+      event.preventDefault();
+      document.getElementById("popupOverlay").style.display = "flex";
+  });
+  document.getElementById("closePopup").addEventListener("click", function() {
+      document.getElementById("popupOverlay").style.display = "none";
+  });
+
 
   // Menu elevator animation
   $('.scroll-to-section a[href*=\\#]:not([href=\\#])').on('click', function() {
