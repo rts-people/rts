@@ -46,8 +46,9 @@
           <nav class="main-nav">
             <!-- ***** Logo Start ***** -->
             <a href="index.html" class="logo">
-              <!-- <h4>RT<span> Suryo</span></h4> -->
-               <img src="assets/images/logo-rts.png" class="header-logo-navbar" alt="">
+              <h4>
+                <img src="assets/images/logo-rts.png" class="header-logo-navbar" alt="">
+              </h4>
             </a>
             <!-- ***** Logo End ***** -->
             <!-- ***** Menu Start ***** -->
@@ -58,7 +59,9 @@
               <li class="scroll-to-section"><a href="#portfolio">Kampanye</a></li>
               <li class="scroll-to-section"><a href="#blog">Berita</a></li> 
               <li class="scroll-to-section"><a href="#contact">Hubungi Kami</a></li> 
-              <li class="scroll-to-section"><div class="main-red-button"><a href="#contact">Donasi</a></div></li> 
+              <li class="scroll-to-section"><div class="main-red-button"><a href="#" id="donasiButton">Donasi</a>
+                </div>
+            </li> 
             </ul>        
             <a class='menu-trigger'>
                 <span>Menu</span>
@@ -69,6 +72,31 @@
       </div>
     </div>
   </header>
+
+  <div class="popup-overlay" id="popupOverlay">
+    <div class="popup">
+        <h2>Donasi</h2>
+        <form>
+            <div class="donasi-buttons">
+                <button type="button" onclick="setNominal(50000)">50.000</button>
+                <button type="button" onclick="setNominal(100000)">100.000</button>
+                <button type="button" onclick="setNominal(200000)">200.000</button>
+                <button type="button" onclick="setNominal(500000)">500.000</button>
+            </div>
+            <input type="number" id="nominal" placeholder="Atau masukkan nominal lain" required>
+            <select required>
+                <option value="">Pilih Metode</option>
+                <option value="transfer">Transfer Bank</option>
+                <option value="ewallet">QRIS</option>
+            </select>
+            <div class="separator"></div>
+            <input type="text" placeholder="Nama Donatur" required>
+            <input type="tel" placeholder="Nomor WhatsApp" required>
+            <button type="submit" class="submit-btn">Donasi Sekarang</button>
+            <button type="button" class="close-btn" id="closePopup">Tutup</button>
+        </form>
+    </div>
+  </div>
   <!-- ***** Header Area End ***** -->
 
   <div class="main-banner wow fadeIn" id="top" data-wow-duration="1s" data-wow-delay="0.5s">
@@ -108,8 +136,8 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-4">
-          <div class="left-image wow fadeIn" data-wow-duration="1s" data-wow-delay="0.2s">
-            <img src="assets/images/about-left-image.png" alt="person graphic">
+          <div class="left-image wow fadeIn" data-wow-duration="1s" data-wow-delay="0.2s">            
+            <img src="assets/images/about-left-image.png" alt="">
           </div>
         </div>
         <div class="col-lg-8 align-self-center">
