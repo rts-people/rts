@@ -694,7 +694,7 @@ header
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 855px) {
   .background-header .main-nav .nav {
     margin-top: 80px !important;
   }
@@ -799,7 +799,7 @@ header
   }
 }
 
-@media (min-width: 800px) {
+@media (min-width: 855px) {
   .header-area .main-nav .nav {
     display: flex !important;
   }
