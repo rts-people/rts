@@ -1,0 +1,411 @@
+# DETAIL REQUIREMENT DOCUMENT
+## WEBSITE RUMAH SINGGAH
+
+**Versi Dokumen:** 2.0  
+**Tanggal:** 3 Juni 2025  
+**Klien:** Rumah Singgah [Nama]  
+**Kontak:** [Detail Kontak]
+
+---
+
+## DAFTAR ISI
+1. [PENDAHULUAN](#1-pendahuluan)
+2. [DESKRIPSI UMUM](#2-deskripsi-umum)
+3. [KEBUTUHAN ANTARMUKA EKSTERNAL](#3-kebutuhan-antarmuka-eksternal)
+4. [KEBUTUHAN FUNGSIONAL](#4-kebutuhan-fungsional)
+5. [KEBUTUHAN NON-FUNGSIONAL](#5-kebutuhan-non-fungsional)
+6. [PERSYARATAN LAINNYA](#6-persyaratan-lainnya)
+7. [APPENDIX](#7-appendix)
+
+---
+
+## 1. PENDAHULUAN
+
+### 1.1. Tujuan Dokumen
+Dokumen ini bertujuan untuk mendefinisikan persyaratan dan spesifikasi teknis untuk pengembangan website Rumah Singgah yang komprehensif. Dokumen ini akan menjadi panduan utama bagi tim pengembang dan referensi untuk semua pihak yang terlibat dalam proses pengembangan website dengan arsitektur multi-tenant yang dapat diskalakan.
+
+### 1.2. Ruang Lingkup Proyek
+Proyek ini mencakup pengembangan sebuah Progressive Web Application (PWA) untuk Rumah Singgah dengan fungsi company profile, sistem donasi terintegrasi, portal informasi untuk penghuni, sistem manajemen kesehatan, dan dashboard analitik untuk pengurus. Website ini dirancang dengan arsitektur multi-tenant untuk mendukung multiple rumah singgah dalam satu sistem dengan empat jenis pengguna utama: pengunjung umum/donatur, penghuni rumah singgah, pengurus rumah singgah, dan super admin multi-tenant.
+
+### 1.3. Definisi, Akronim, dan Singkatan
+- **RS**: Rumah Singgah
+- **CMS**: Content Management System
+- **UX**: User Experience
+- **UI**: User Interface
+- **API**: Application Programming Interface
+- **RBAC**: Role-Based Access Control
+- **PWA**: Progressive Web Application
+- **CDN**: Content Delivery Network
+- **GDPR**: General Data Protection Regulation
+- **KYC**: Know Your Customer
+- **PCI DSS**: Payment Card Industry Data Security Standard
+
+### 1.4. Referensi
+- Dokumen visi dan misi Rumah Singgah
+- Proses bisnis existing Rumah Singgah
+- Regulasi Kementerian Sosial RI tentang Rumah Singgah
+- Standar keamanan data kesehatan Indonesia
+- Best practices pengembangan web modern dan PWA
+- Panduan aksesibilitas WCAG 2.1
+
+### 1.5. Gambaran Umum Dokumen
+Dokumen ini dibagi menjadi beberapa bagian utama: pendahuluan, deskripsi umum produk, kebutuhan antarmuka eksternal, kebutuhan fungsional yang dikelompokkan berdasarkan modul dengan user stories yang detail, kebutuhan non-fungsional yang mencakup performa dan keamanan, persyaratan teknis termasuk integrasi dengan sistem eksternal, dan appendix dengan diagram teknis serta timeline implementasi.
+
+---
+
+## 2. DESKRIPSI UMUM
+
+### 2.1. Perspektif Produk
+Website Rumah Singgah merupakan sistem terpadu berbasis cloud dengan arsitektur multi-tenant yang akan menjadi platform utama untuk komunikasi eksternal (company profile dan donasi), manajemen internal (data penghuni dan pengurus), sistem kesehatan terintegrasi, dan analitik bisnis. Website ini akan menggantikan sistem manual yang ada dan menyediakan pengalaman digital yang efisien dengan kemampuan offline-first untuk fitur kritikal.
+
+### 2.2. Fungsi Produk
+Fungsi utama website mencakup:
+- Penyediaan informasi comprehensive tentang Rumah Singgah kepada publik
+- Pengelolaan sistem donasi uang dan barang dengan multiple payment gateway
+- Portal informasi dan manajemen kesehatan terintegrasi untuk penghuni
+- Sistem manajemen data, inventory, dan analitik untuk pengurus
+- Dashboard multi-tenant untuk pengelolaan beberapa rumah singgah
+- Sistem pelaporan otomatis untuk compliance pemerintah
+- Integration hub untuk sistem eksternal (BPJS, Puskesmas, dll)
+
+### 2.3. Karakteristik Pengguna
+
+#### 2.3.1. Pengunjung Umum
+- **Deskripsi**: Masyarakat umum yang ingin mengetahui informasi tentang Rumah Singgah
+- **Tingkat Pendidikan**: Beragam (SD hingga Perguruan Tinggi)
+- **Pengalaman Teknis**: Minimal hingga menengah
+- **Rentang Usia**: 18-65 tahun
+- **Device Preference**: 70% Mobile, 30% Desktop
+- **Aktivitas Utama**: Membaca informasi, melihat berita dan agenda, social sharing
+
+#### 2.3.2. Donatur
+- **Deskripsi**: Individu atau organisasi yang ingin menyumbang kepada Rumah Singgah
+- **Tingkat Pendidikan**: Menengah hingga tinggi
+- **Pengalaman Teknis**: Menengah (familiar dengan e-commerce dan e-banking)
+- **Rentang Usia**: 25-55 tahun
+- **Device Preference**: 60% Mobile, 40% Desktop
+- **Aktivitas Utama**: Melakukan donasi uang/barang, tracking donasi, melihat impact report
+
+#### 2.3.3. Penghuni Rumah Singgah
+- **Deskripsi**: Orang yang tinggal sementara di Rumah Singgah
+- **Tingkat Pendidikan**: Beragam (SD hingga SMA)
+- **Pengalaman Teknis**: Minimal hingga menengah
+- **Rentang Usia**: 16-60 tahun
+- **Device Preference**: 90% Mobile, 10% Desktop
+- **Aktivitas Utama**: Check-in/out, laporan kesehatan, komunikasi dengan pengurus
+
+#### 2.3.4. Pengurus/Admin
+- **Deskripsi**: Staff yang mengelola operasional Rumah Singgah
+- **Tingkat Pendidikan**: Menengah hingga tinggi
+- **Pengalaman Teknis**: Menengah hingga tinggi
+- **Rentang Usia**: 22-50 tahun
+- **Device Preference**: 40% Mobile, 60% Desktop
+- **Aktivitas Utama**: Manajemen konten, data penghuni, donasi, dan pelaporan
+
+#### 2.3.5. Super Admin Multi-Tenant
+- **Deskripsi**: Administrator sistem yang mengelola multiple rumah singgah
+- **Tingkat Pendidikan**: Tinggi (minimal S1)
+- **Pengalaman Teknis**: Tinggi
+- **Rentang Usia**: 25-45 tahun
+- **Device Preference**: 20% Mobile, 80% Desktop
+- **Aktivitas Utama**: Monitoring sistem, analytics, konfigurasi multi-tenant
+
+### 2.4. Batasan Umum
+- Website harus dapat diakses melalui browser modern (Chrome 88+, Firefox 85+, Safari 14+, Edge 88+)
+- Progressive Web App (PWA) dengan offline capability untuk fitur kritikal
+- Responsif dan optimal untuk perangkat desktop, tablet, dan mobile
+- Compliance dengan regulasi privasi data Indonesia dan standar internasional
+- Integrasi dengan payment gateway lokal dan internasional
+- Support untuk multi-bahasa (Bahasa Indonesia dan Inggris)
+- Maksimal 2MB initial bundle size untuk performa optimal
+
+### 2.5. Asumsi dan Ketergantungan
+- Rumah Singgah memiliki koneksi internet stabil minimal 10 Mbps
+- Pengurus memiliki smartphone atau komputer dengan akses internet
+- Tersedia integrasi dengan minimal 2 payment gateway untuk redundancy
+- Penghuni memiliki akses ke perangkat mobile (smartphone/tablet)
+- Tersedia koneksi dengan sistem kesehatan nasional (BPJS, Puskesmas)
+- Budget tersedia untuk cloud hosting dengan SLA 99.9% uptime
+- Tim IT internal atau vendor maintenance tersedia untuk support ongoing
+
+---
+
+## 3. KEBUTUHAN ANTARMUKA EKSTERNAL
+
+### 3.1. Antarmuka Pengguna
+- **Design System**: Material Design 3.0 dengan custom branding per rumah singgah
+- **Responsif**: Breakpoints untuk Mobile (320px+), Tablet (768px+), Desktop (1024px+)
+- **Accessibility**: WCAG 2.1 AA compliance dengan screen reader support
+- **PWA Features**: Installable, offline-capable, push notifications
+- **Dark/Light Mode**: Automatic detection dengan manual override
+- **Multi-language**: Indonesian (primary), English (secondary)
+- **Performance**: First Contentful Paint < 1.5s, Largest Contentful Paint < 2.5s
+
+### 3.2. Antarmuka Hardware
+- **Mobile Devices**: iOS 12+, Android 8.0+ dengan minimal 2GB RAM
+- **Desktop/Laptop**: Windows 10+, macOS 10.15+, Linux (Ubuntu 18.04+)
+- **Tablet**: iPad (iOS 12+), Android tablets
+- **Input Methods**: Touch, mouse, keyboard, voice input (future)
+- **Camera**: Support untuk foto upload (donasi barang, profil)
+- **GPS**: Location services untuk check-in/out dan emergency
+
+### 3.3. Antarmuka Software
+- **Frontend**: Progressive Web App (React.js + Service Worker)
+- **Backend**: Node.js + Express atau Python + Django
+- **Database**: PostgreSQL (primary), Redis (caching)
+- **File Storage**: AWS S3 atau Google Cloud Storage dengan CDN
+- **Real-time**: WebSocket untuk notifikasi real-time
+- **Analytics**: Google Analytics 4 + custom event tracking
+
+### 3.4. Antarmuka Komunikasi
+- **HTTP/HTTPS**: REST API dengan GraphQL untuk complex queries
+- **WebSocket**: Real-time notifications dan messaging
+- **Push Notifications**: Firebase Cloud Messaging (FCM)
+- **Email**: SendGrid atau Mailgun untuk transactional emails
+- **SMS**: Twilio atau local SMS gateway untuk critical alerts
+- **WhatsApp**: WhatsApp Business API untuk customer support
+
+### 3.5. Integrasi Sistem Eksternal
+
+#### 3.5.1. Payment Gateway
+- **Primary**: Midtrans (local preference)
+- **Secondary**: Xendit (backup dan international)
+- **Tertiary**: Doku (established reliability)
+- **Supported Methods**: Bank Transfer, Credit/Debit Card, E-Wallet (GoPay, OVO, DANA), Virtual Account
+
+#### 3.5.2. Sistem Kesehatan
+- **BPJS API**: Untuk verifikasi kepesertaan dan klaim
+- **Puskesmas Integration**: Data sharing untuk rujukan
+- **Apotek Partnership**: Real-time stock check untuk obat
+- **Telemedicine Platform**: Konsultasi online untuk penghuni
+
+#### 3.5.3. Sistem Pemerintah
+- **Kemensos Integration**: Pelaporan otomatis sesuai format standar
+- **Dukcapil Integration**: Verifikasi NIK dan data penduduk
+- **BPNT Integration**: Koordinasi bantuan sosial
+
+#### 3.5.4. Mapping dan Lokasi
+- **Google Maps API**: Lokasi rumah singgah dan navigasi
+- **Google Places API**: Pencarian lokasi nearby services
+- **Geocoding API**: Konversi alamat ke koordinat
+
+#### 3.5.5. Komunikasi dan Social Media
+- **WhatsApp Business API**: Customer support dan notifications
+- **Facebook Graph API**: Social login dan sharing
+- **Google OAuth**: Single sign-on
+- **Instagram Basic Display**: Gallery integration
+
+---
+
+## 4. KEBUTUHAN FUNGSIONAL
+
+### 4.1. Modul Halaman Publik
+
+#### 4.1.1. Company Profile
+- **Deskripsi**: Halaman yang menyajikan informasi comprehensive tentang Rumah Singgah dengan storytelling yang engaging
+- **Input**: N/A (konten dari CMS)
+- **Proses**: Server-side rendering untuk SEO optimal, progressive image loading
+- **Output**: Halaman informasi yang optimized dan accessible
+- **Kriteria Sukses**: Page load < 2s, SEO score 90+, accessibility score AA
+
+**User Stories**:
+1. Sebagai pengunjung, saya ingin mengetahui visi, misi, dan sejarah Rumah Singgah dengan timeline interaktif sehingga saya memahami perjalanan organisasi
+2. Sebagai pengunjung, saya ingin melihat informasi kontak, lokasi dengan maps interaktif, dan jam operasional sehingga saya dapat mengunjungi atau menghubungi
+3. Sebagai pengunjung, saya ingin melihat profil lengkap tim pengurus dengan foto dan latar belakang sehingga saya mengetahui kredibilitas organisasi
+4. Sebagai pengunjung, saya ingin melihat sertifikasi dan penghargaan yang diterima Rumah Singgah untuk membangun trust
+5. Sebagai pengunjung, saya ingin dapat berbagi informasi Rumah Singgah ke social media dengan preview yang menarik
+
+#### 4.1.2. Portal Berita dan Agenda
+- **Deskripsi**: Content hub dengan berita, artikel, dan agenda kegiatan dengan sistem engagement
+- **Input**: Search query, filter kategori, pagination parameters
+- **Proses**: Full-text search dengan Elasticsearch, content caching, social sharing tracking
+- **Output**: Daftar konten yang relevan dengan engagement metrics
+- **Kriteria Sukses**: Search response < 500ms, 70% content engagement rate
+
+**User Stories**:
+1. Sebagai pengunjung, saya ingin melihat berita terbaru dengan thumbnail yang menarik dan preview snippet
+2. Sebagai pengunjung, saya ingin mencari berita berdasarkan kategori, tag, atau kata kunci dengan filter yang intuitif
+3. Sebagai pengunjung, saya ingin melihat agenda kegiatan dengan kalender interaktif dan reminder option
+4. Sebagai pengunjung, saya ingin dapat comment dan share artikel untuk meningkatkan engagement
+5. Sebagai pengunjung, saya ingin subscribe ke newsletter untuk mendapatkan update terbaru
+6. Sebagai pengunjung, saya ingin melihat related articles dan trending topics
+
+#### 4.1.3. Galeri Multimedia
+- **Deskripsi**: Media showcase dengan advanced gallery features dan storytelling visual
+- **Input**: Filter kategori, search, sort options
+- **Proses**: Lazy loading, image optimization, CDN delivery, metadata extraction
+- **Output**: Responsive gallery dengan lightbox dan social sharing
+- **Kriteria Sukses**: Image load optimization 80% size reduction, smooth scrolling performance
+
+**User Stories**:
+1. Sebagai pengunjung, saya ingin melihat foto dan video kegiatan dengan kualitas HD dan loading yang cepat
+2. Sebagai pengunjung, saya ingin dapat filter media berdasarkan tanggal, kegiatan, atau kategori
+3. Sebagai pengunjung, saya ingin dapat download foto untuk keperluan sharing dengan watermark
+4. Sebagai pengunjung, saya ingin melihat slideshow otomatis untuk pengalaman yang immersive
+5. Sebagai pengunjung, saya ingin dapat share individual media ke social media dengan caption yang sudah disiapkan
+
+#### 4.1.4. Kontak dan Lokasi
+- **Deskripsi**: Comprehensive contact hub dengan multiple communication channels
+- **Input**: Contact form data, location queries, feedback
+- **Proses**: Form validation, spam protection, auto-response, ticket creation
+- **Output**: Contact information, interactive map, form submission confirmation
+- **Kriteria Sukses**: Form submission success rate 95%, response time to inquiries < 24 hours
+
+**User Stories**:
+1. Sebagai pengunjung, saya ingin melihat alamat lengkap dengan Google Maps integration dan directions
+2. Sebagai pengunjung, saya ingin dapat mengirim pesan melalui form kontak dengan tracking status
+3. Sebagai pengunjung, saya ingin melihat multiple cara menghubungi (telepon, email, WhatsApp, social media)
+4. Sebagai pengunjung, saya ingin melihat jam operasional dan informasi ketersediaan real-time
+5. Sebagai pengunjung, saya ingin dapat melakukan appointment booking untuk kunjungan
+6. Sebagai pengunjung, saya ingin mendapatkan auto-reply dengan estimated response time
+
+### 4.2. Modul Sistem Donasi
+
+#### 4.2.1. Pendaftaran dan Manajemen Donatur
+- **Deskripsi**: Comprehensive donor management dengan KYC dan engagement tracking
+- **Input**: Personal data, verification documents, preferences
+- **Proses**: Multi-step registration, email/SMS verification, KYC validation, profile building
+- **Output**: Verified donor account dengan personalized dashboard
+- **Kriteria Sukses**: Registration completion rate 85%, verification success rate 90%
+
+**User Stories**:
+1. Sebagai calon donatur, saya ingin mendaftar dengan cepat menggunakan email, phone, atau social login
+2. Sebagai calon donatur, saya ingin melakukan verifikasi identitas yang mudah dan aman
+3. Sebagai donatur, saya ingin mengatur preferensi donasi dan notification settings
+4. Sebagai donatur, saya ingin dapat mengupdate profil dan informasi kontak
+5. Sebagai donatur, saya ingin melihat donation history dan tax benefits
+6. Sebagai donatur, saya ingin dapat mengundang teman untuk bergabung dengan referral program
+
+#### 4.2.2. Sistem Donasi Uang Advanced
+- **Deskripsi**: Sophisticated financial donation system dengan multiple scenarios
+- **Input**: Donation amount, payment method, campaign selection, recurring options
+- **Proses**: Amount validation, payment processing, receipt generation, impact calculation
+- **Output**: Payment confirmation, digital receipt, impact report preview
+- **Kriteria Sukses**: Payment success rate 98%, average donation completion time < 3 minutes
+
+**User Stories**:
+1. Sebagai donatur, saya ingin memilih dari preset amounts atau input custom amount dengan suggestions
+2. Sebagai donatur, saya ingin memilih campaign specific atau unrestricted donation
+3. Sebagai donatur, saya ingin setup recurring donation dengan flexible schedule
+4. Sebagai donatur, saya ingin melihat real-time impact calculation dari donasi saya
+5. Sebagai donatur, saya ingin menerima instant receipt dan tax deduction certificate
+6. Sebagai donatur, saya ingin dapat donate secara anonymous atau with public recognition
+7. Sebagai donatur, saya ingin dapat memorial donation untuk orang tercinta
+8. Sebagai donatur, saya ingin melihat matching gift opportunities dari employer
+
+#### 4.2.3. Sistem Donasi Barang Terintegrasi
+- **Deskripsi**: Complete in-kind donation management dengan inventory integration
+- **Input**: Item details, photos, condition, quantity, pickup/delivery preferences
+- **Proses**: Item validation, photo processing, scheduling, inventory matching, approval workflow
+- **Output**: Donation confirmation, pickup schedule, impact tracking
+- **Kriteria Sukses**: Item acceptance rate 80%, pickup schedule adherence 95%
+
+**User Stories**:
+1. Sebagai donatur, saya ingin melihat most needed items list dengan priority levels
+2. Sebagai donatur, saya ingin upload foto dan deskripsi barang dengan guided form
+3. Sebagai donatur, saya ingin memilih delivery method (pickup, drop-off, courier)
+4. Sebagai donatur, saya ingin mendapatkan pre-approval sebelum final commitment
+5. Sebagai donatur, saya ingin tracking status dari pickup hingga distribution
+6. Sebagai donatur, saya ingin melihat impact story dari barang yang saya donasikan
+7. Sebagai donatur, saya ingin dapat batch donation untuk multiple items
+8. Sebagai donatur, saya ingin mendapatkan tax deduction valuation untuk barang
+
+#### 4.2.4. Dashboard Donatur Personal
+- **Deskripsi**: Personalized donor portal dengan comprehensive analytics dan engagement tools
+- **Input**: Dashboard preferences, filter options, date ranges
+- **Proses**: Data aggregation, impact calculation, story matching, recommendation engine
+- **Output**: Personalized dashboard dengan actionable insights
+- **Kriteria Sukses**: Daily active users 40%, average session duration 5+ minutes
+
+**User Stories**:
+1. Sebagai donatur, saya ingin melihat donation summary dengan visual charts dan trends
+2. Sebagai donatur, saya ingin melihat personalized impact stories dari donasi saya
+3. Sebagai donatur, saya ingin mendapatkan recommendation untuk donasi selanjutnya
+4. Sebagai donatur, saya ingin melihat milestone achievements dan recognition badges
+5. Sebagai donatur, saya ingin dapat set dan track personal giving goals
+6. Sebagai donatur, saya ingin melihat thank you messages dan updates dari penerima
+7. Sebagai donatur, saya ingin dapat invite friends dan track referral impact
+8. Sebagai donatur, saya ingin export data untuk personal tax filing
+
+#### 4.2.5. Crowdfunding dan Campaign Management
+- **Deskripsi**: Campaign-based fundraising dengan social sharing dan milestone tracking
+- **Input**: Campaign search, filter, social sharing data
+- **Proses**: Campaign matching, progress tracking, social amplification, milestone notifications
+- **Output**: Campaign listings, progress visualization, sharing analytics
+- **Kriteria Sukses**: Campaign completion rate 70%, social sharing rate 30%
+
+**User Stories**:
+1. Sebagai donatur, saya ingin melihat active campaigns dengan compelling stories dan clear goals
+2. Sebagai donatur, saya ingin tracking campaign progress dengan real-time updates
+3. Sebagai donatur, saya ingin share campaigns ke social media dengan personalized message
+4. Sebagai donatur, saya ingin melihat leaderboard dan social proof dari donors lain
+5. Sebagai donatur, saya ingin mendapatkan milestone notifications dan celebrate achievements
+6. Sebagai donatur, saya ingin dapat create peer-to-peer fundraising campaign
+7. Sebagai donatur, saya ingin melihat campaign impact report setelah completion
+
+#### 4.2.6. Sistem Pelaporan dan Transparansi
+- **Deskripsi**: Comprehensive reporting system untuk accountability dan trust building
+- **Input**: Report parameters, date ranges, export preferences
+- **Proses**: Data aggregation, report generation, compliance checking, audit trail
+- **Output**: Financial reports, impact reports, tax documents, audit files
+- **Kriteria Sukses**: Report accuracy 99.9%, generation time < 30 seconds
+
+**User Stories**:
+1. Sebagai donatur, saya ingin melihat financial transparency report dengan breakdown penggunaan dana
+2. Sebagai donatur, saya ingin download tax-compliant donation receipts untuk filing
+3. Sebagai donatur, saya ingin melihat quarterly impact reports dengan stories dan metrics
+4. Sebagai pengurus, saya ingin generate compliance reports untuk government submission
+5. Sebagai pengurus, saya ingin automated monthly financial reports dengan variance analysis
+6. Sebagai auditor, saya ingin akses ke audit trail dan supporting documents
+
+### 4.3. Modul Penghuni (Internal)
+
+#### 4.3.1. Sistem Autentikasi dan Profil Penghuni
+- **Deskripsi**: Secure authentication dengan comprehensive profile management
+- **Input**: Login credentials, biometric data (optional), profile information
+- **Proses**: Multi-factor authentication, session management, profile validation
+- **Output**: Authenticated session, personalized profile dashboard
+- **Kriteria Sukses**: Login success rate 99%, profile completion rate 90%
+
+**User Stories**:
+1. Sebagai penghuni, saya ingin login dengan mudah menggunakan username/password atau biometric
+2. Sebagai penghuni, saya ingin dapat update profil personal dengan foto dan informasi terkini
+3. Sebagai penghuni, saya ingin setup emergency contacts dan medical information
+4. Sebagai penghuni, saya ingin privacy controls untuk menentukan data apa yang visible
+5. Sebagai penghuni, saya ingin dapat reset password dengan security questions atau SMS
+6. Sebagai penghuni, saya ingin session timeout yang reasonable untuk security
+
+#### 4.3.2. Portal Informasi dan Komunikasi Penghuni
+- **Deskripsi**: Centralized information hub dengan real-time communication
+- **Input**: Message composition, information requests, feedback
+- **Proses**: Content filtering, real-time messaging, notification routing
+- **Output**: Organized information feed, conversation threads, notifications
+- **Kriteria Sukses**: Information engagement rate 80%, response time < 2 hours
+
+**User Stories**:
+1. Sebagai penghuni, saya ingin melihat announcement dan updates penting dari pengurus
+2. Sebagai penghuni, saya ingin melihat daily schedule dan upcoming activities
+3. Sebagai penghuni, saya ingin dapat mengirim private messages ke pengurus
+4. Sebagai penghuni, saya ingin join group discussions dan community boards
+5. Sebagai penghuni, saya ingin mendapatkan push notifications untuk urgent information
+6. Sebagai penghuni, saya ingin dapat request help atau report issues
+7. Sebagai penghuni, saya ingin akses ke resource library (forms, guides, contacts)
+
+#### 4.3.3. Sistem Check-in/Check-out Advanced
+- **Deskripsi**: Sophisticated occupancy management dengan biometric dan geofencing
+- **Input**: Check-in/out requests, location data, biometric verification, duration estimates
+- **Proses**: Location verification, capacity checking, document generation, notification dispatch
+- **Output**: Check-in/out confirmation, occupancy certificates, notifications to stakeholders
+- **Kriteria Sukses**: Check-in accuracy 99%, processing time < 2 minutes
+
+**User Stories**:
+1. Sebagai penghuni baru, saya ingin melakukan check-in dengan guided onboarding process
+2. Sebagai penghuni, saya ingin dapat temporary check-out untuk appointments atau work
+3. Sebagai penghuni, saya ingin melihat remaining duration dan renewal options
+4. Sebagai penghuni, saya ingin dapat request extension dengan justification
+5. Sebagai penghuni, saya ingin smooth check-out process dengan feedback collection
+6. Sebagai penghuni, saya ingin dapat emergency check-in jika returning late
+7. Sebagai pengurus, saya ingin real-time occupancy monitoring dan alerts
+
+#### 4.3.4. Sistem Kesehatan Terintegrasi
+- **Deskripsi**: Comprehensive health management dengan telemedicine integration
