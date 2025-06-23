@@ -1,411 +1,917 @@
-# DETAIL REQUIREMENT DOCUMENT
-## WEBSITE RUMAH SINGGAH
-
-**Versi Dokumen:** 2.0  
-**Tanggal:** 3 Juni 2025  
-**Klien:** Rumah Singgah [Nama]  
-**Kontak:** [Detail Kontak]
+# Document Requirement Design (DRD)
+## Sistem Rumah Singgah Pasien Anak
 
 ---
 
-## DAFTAR ISI
-1. [PENDAHULUAN](#1-pendahuluan)
-2. [DESKRIPSI UMUM](#2-deskripsi-umum)
-3. [KEBUTUHAN ANTARMUKA EKSTERNAL](#3-kebutuhan-antarmuka-eksternal)
-4. [KEBUTUHAN FUNGSIONAL](#4-kebutuhan-fungsional)
-5. [KEBUTUHAN NON-FUNGSIONAL](#5-kebutuhan-non-fungsional)
-6. [PERSYARATAN LAINNYA](#6-persyaratan-lainnya)
-7. [APPENDIX](#7-appendix)
+## 1. OVERVIEW PROJECT
+
+### 1.1 Deskripsi Project
+Sistem informasi berbasis web untuk mengelola operasional Rumah Singgah Pasien Anak dengan 3 jenis pengguna: Pengunjung/Donatur, Penghuni, dan Pengurus.
+
+### 1.2 Teknologi yang Digunakan
+- **Backend**: Laravel (PHP 8.1+)
+- **Frontend**: Native HTML, CSS, JavaScript (dari repository existing)
+- **Database**: MySQL 
+- **Hosting**: Shared Hosting Hostinger
+- **Integration**: WhatsApp API, Email SMTP
+
+### 1.3 Target Pengguna
+1. **Pengunjung/Donatur** - Akses publik tanpa registrasi
+2. **Penghuni** - Orang tua/penanggung jawab pasien anak
+3. **Pengurus** - 20 orang dengan role berbeda (pengamat, pengambil keputusan, driver, admin)
 
 ---
 
-## 1. PENDAHULUAN
+## 2. ANALISIS SISTEM
 
-### 1.1. Tujuan Dokumen
-Dokumen ini bertujuan untuk mendefinisikan persyaratan dan spesifikasi teknis untuk pengembangan website Rumah Singgah yang komprehensif. Dokumen ini akan menjadi panduan utama bagi tim pengembang dan referensi untuk semua pihak yang terlibat dalam proses pengembangan website dengan arsitektur multi-tenant yang dapat diskalakan.
+### 2.1 Functional Requirements
 
-### 1.2. Ruang Lingkup Proyek
-Proyek ini mencakup pengembangan sebuah Progressive Web Application (PWA) untuk Rumah Singgah dengan fungsi company profile, sistem donasi terintegrasi, portal informasi untuk penghuni, sistem manajemen kesehatan, dan dashboard analitik untuk pengurus. Website ini dirancang dengan arsitektur multi-tenant untuk mendukung multiple rumah singgah dalam satu sistem dengan empat jenis pengguna utama: pengunjung umum/donatur, penghuni rumah singgah, pengurus rumah singgah, dan super admin multi-tenant.
+#### 2.1.1 Modul Pengunjung/Donatur
+- Melihat berita dan artikel
+- Statistik penghuni (jenis penyakit, asal, jenis kelamin)
+- Company profile
+- Form donasi tanpa registrasi
+- Berlangganan email newsletter
+- Konfirmasi donasi via WhatsApp & Email
 
-### 1.3. Definisi, Akronim, dan Singkatan
-- **RS**: Rumah Singgah
-- **CMS**: Content Management System
-- **UX**: User Experience
-- **UI**: User Interface
-- **API**: Application Programming Interface
-- **RBAC**: Role-Based Access Control
-- **PWA**: Progressive Web Application
-- **CDN**: Content Delivery Network
-- **GDPR**: General Data Protection Regulation
-- **KYC**: Know Your Customer
-- **PCI DSS**: Payment Card Industry Data Security Standard
+#### 2.1.2 Modul Penghuni
+- **Registrasi Check-in** (33 field + 9 dokumen foto)
+- Login dengan Nomor Pasien + Password
+- Dashboard informasi personal
+- Melihat pengumuman dari pengurus
+- Melihat jadwal piket
+- Input histori berobat
+- Membuat jadwal kunjungan RS (terhubung ke driver)
+- Komunikasi dengan pengurus
+- Proses check-out
+- Lapor selesai tugas piket
 
-### 1.4. Referensi
-- Dokumen visi dan misi Rumah Singgah
-- Proses bisnis existing Rumah Singgah
-- Regulasi Kementerian Sosial RI tentang Rumah Singgah
-- Standar keamanan data kesehatan Indonesia
-- Best practices pengembangan web modern dan PWA
-- Panduan aksesibilitas WCAG 2.1
+#### 2.1.3 Modul Penghuni
+- **Registrasi Check-in Bertahap** (3 step wizard + upload bertahap)
+  - Step 1: Data Pasien & Penanggung Jawab
+  - Step 2: Data Medis & Rujukan  
+  - Step 3: Data Pendamping & Upload Dokumen
+- Login dengan Nomor Pasien + Password
+- Dashboard informasi personal
+- **Notifikasi in-app** real-time
+- Melihat pengumuman dari pengurus
+- Melihat jadwal piket
+- Input histori berobat
+- Membuat jadwal kunjungan RS (terhubung ke driver)
+- Komunikasi dengan pengurus
+- Proses check-out
+- Lapor selesai tugas piket
 
-### 1.5. Gambaran Umum Dokumen
-Dokumen ini dibagi menjadi beberapa bagian utama: pendahuluan, deskripsi umum produk, kebutuhan antarmuka eksternal, kebutuhan fungsional yang dikelompokkan berdasarkan modul dengan user stories yang detail, kebutuhan non-fungsional yang mencakup performa dan keamanan, persyaratan teknis termasuk integrasi dengan sistem eksternal, dan appendix dengan diagram teknis serta timeline implementasi.
+#### 2.1.4 Modul Pengurus
+- Login multi-role (pengamat, pengambil keputusan, driver, admin)
+- Dashboard statistik penghuni
+- **Notifikasi in-app** untuk semua aktivitas
+- Manajemen data penghuni
+- Monitoring update pengobatan penghuni
+- Manajemen kamar dan penempatan pasien
+- Penjadwalan piket berdasarkan status aktif
+- Laporan hasil piket
+- Jadwal antar jemput (driver) berdasarkan kloter
+- Komunikasi dengan penghuni via WhatsApp
+- **CMS Berita** (khusus role admin):
+  - Create, edit, delete berita
+  - Upload gambar untuk berita
+  - Publish/unpublish berita
+  - SEO management (meta title, description)
+  - Auto-notify subscribers saat publish
+  - Preview sebelum publish
 
----
-
-## 2. DESKRIPSI UMUM
-
-### 2.1. Perspektif Produk
-Website Rumah Singgah merupakan sistem terpadu berbasis cloud dengan arsitektur multi-tenant yang akan menjadi platform utama untuk komunikasi eksternal (company profile dan donasi), manajemen internal (data penghuni dan pengurus), sistem kesehatan terintegrasi, dan analitik bisnis. Website ini akan menggantikan sistem manual yang ada dan menyediakan pengalaman digital yang efisien dengan kemampuan offline-first untuk fitur kritikal.
-
-### 2.2. Fungsi Produk
-Fungsi utama website mencakup:
-- Penyediaan informasi comprehensive tentang Rumah Singgah kepada publik
-- Pengelolaan sistem donasi uang dan barang dengan multiple payment gateway
-- Portal informasi dan manajemen kesehatan terintegrasi untuk penghuni
-- Sistem manajemen data, inventory, dan analitik untuk pengurus
-- Dashboard multi-tenant untuk pengelolaan beberapa rumah singgah
-- Sistem pelaporan otomatis untuk compliance pemerintah
-- Integration hub untuk sistem eksternal (BPJS, Puskesmas, dll)
-
-### 2.3. Karakteristik Pengguna
-
-#### 2.3.1. Pengunjung Umum
-- **Deskripsi**: Masyarakat umum yang ingin mengetahui informasi tentang Rumah Singgah
-- **Tingkat Pendidikan**: Beragam (SD hingga Perguruan Tinggi)
-- **Pengalaman Teknis**: Minimal hingga menengah
-- **Rentang Usia**: 18-65 tahun
-- **Device Preference**: 70% Mobile, 30% Desktop
-- **Aktivitas Utama**: Membaca informasi, melihat berita dan agenda, social sharing
-
-#### 2.3.2. Donatur
-- **Deskripsi**: Individu atau organisasi yang ingin menyumbang kepada Rumah Singgah
-- **Tingkat Pendidikan**: Menengah hingga tinggi
-- **Pengalaman Teknis**: Menengah (familiar dengan e-commerce dan e-banking)
-- **Rentang Usia**: 25-55 tahun
-- **Device Preference**: 60% Mobile, 40% Desktop
-- **Aktivitas Utama**: Melakukan donasi uang/barang, tracking donasi, melihat impact report
-
-#### 2.3.3. Penghuni Rumah Singgah
-- **Deskripsi**: Orang yang tinggal sementara di Rumah Singgah
-- **Tingkat Pendidikan**: Beragam (SD hingga SMA)
-- **Pengalaman Teknis**: Minimal hingga menengah
-- **Rentang Usia**: 16-60 tahun
-- **Device Preference**: 90% Mobile, 10% Desktop
-- **Aktivitas Utama**: Check-in/out, laporan kesehatan, komunikasi dengan pengurus
-
-#### 2.3.4. Pengurus/Admin
-- **Deskripsi**: Staff yang mengelola operasional Rumah Singgah
-- **Tingkat Pendidikan**: Menengah hingga tinggi
-- **Pengalaman Teknis**: Menengah hingga tinggi
-- **Rentang Usia**: 22-50 tahun
-- **Device Preference**: 40% Mobile, 60% Desktop
-- **Aktivitas Utama**: Manajemen konten, data penghuni, donasi, dan pelaporan
-
-#### 2.3.5. Super Admin Multi-Tenant
-- **Deskripsi**: Administrator sistem yang mengelola multiple rumah singgah
-- **Tingkat Pendidikan**: Tinggi (minimal S1)
-- **Pengalaman Teknis**: Tinggi
-- **Rentang Usia**: 25-45 tahun
-- **Device Preference**: 20% Mobile, 80% Desktop
-- **Aktivitas Utama**: Monitoring sistem, analytics, konfigurasi multi-tenant
-
-### 2.4. Batasan Umum
-- Website harus dapat diakses melalui browser modern (Chrome 88+, Firefox 85+, Safari 14+, Edge 88+)
-- Progressive Web App (PWA) dengan offline capability untuk fitur kritikal
-- Responsif dan optimal untuk perangkat desktop, tablet, dan mobile
-- Compliance dengan regulasi privasi data Indonesia dan standar internasional
-- Integrasi dengan payment gateway lokal dan internasional
-- Support untuk multi-bahasa (Bahasa Indonesia dan Inggris)
-- Maksimal 2MB initial bundle size untuk performa optimal
-
-### 2.5. Asumsi dan Ketergantungan
-- Rumah Singgah memiliki koneksi internet stabil minimal 10 Mbps
-- Pengurus memiliki smartphone atau komputer dengan akses internet
-- Tersedia integrasi dengan minimal 2 payment gateway untuk redundancy
-- Penghuni memiliki akses ke perangkat mobile (smartphone/tablet)
-- Tersedia koneksi dengan sistem kesehatan nasional (BPJS, Puskesmas)
-- Budget tersedia untuk cloud hosting dengan SLA 99.9% uptime
-- Tim IT internal atau vendor maintenance tersedia untuk support ongoing
+### 2.2 Non-Functional Requirements
+- **Performance**: Load time < 3 detik pada shared hosting
+- **Security**: Enkripsi data sensitif pasien (GDPR compliance)
+- **Availability**: 99% uptime pada shared hosting
+- **Scalability**: Mendukung hingga 100 penghuni aktif
+- **Usability**: Mobile-responsive untuk semua user
 
 ---
 
-## 3. KEBUTUHAN ANTARMUKA EKSTERNAL
+## 3. ARSITEKTUR SISTEM
 
-### 3.1. Antarmuka Pengguna
-- **Design System**: Material Design 3.0 dengan custom branding per rumah singgah
-- **Responsif**: Breakpoints untuk Mobile (320px+), Tablet (768px+), Desktop (1024px+)
-- **Accessibility**: WCAG 2.1 AA compliance dengan screen reader support
-- **PWA Features**: Installable, offline-capable, push notifications
-- **Dark/Light Mode**: Automatic detection dengan manual override
-- **Multi-language**: Indonesian (primary), English (secondary)
-- **Performance**: First Contentful Paint < 1.5s, Largest Contentful Paint < 2.5s
+### 3.1 Arsitektur Aplikasi
+```
+Frontend (Native HTML/CSS/JS)
+    ↓
+Laravel API Layer
+    ↓
+Business Logic Layer
+    ↓
+Database Layer (MySQL)
+    ↓
+External Services (WhatsApp API, SMTP)
+```
 
-### 3.2. Antarmuka Hardware
-- **Mobile Devices**: iOS 12+, Android 8.0+ dengan minimal 2GB RAM
-- **Desktop/Laptop**: Windows 10+, macOS 10.15+, Linux (Ubuntu 18.04+)
-- **Tablet**: iPad (iOS 12+), Android tablets
-- **Input Methods**: Touch, mouse, keyboard, voice input (future)
-- **Camera**: Support untuk foto upload (donasi barang, profil)
-- **GPS**: Location services untuk check-in/out dan emergency
-
-### 3.3. Antarmuka Software
-- **Frontend**: Progressive Web App (React.js + Service Worker)
-- **Backend**: Node.js + Express atau Python + Django
-- **Database**: PostgreSQL (primary), Redis (caching)
-- **File Storage**: AWS S3 atau Google Cloud Storage dengan CDN
-- **Real-time**: WebSocket untuk notifikasi real-time
-- **Analytics**: Google Analytics 4 + custom event tracking
-
-### 3.4. Antarmuka Komunikasi
-- **HTTP/HTTPS**: REST API dengan GraphQL untuk complex queries
-- **WebSocket**: Real-time notifications dan messaging
-- **Push Notifications**: Firebase Cloud Messaging (FCM)
-- **Email**: SendGrid atau Mailgun untuk transactional emails
-- **SMS**: Twilio atau local SMS gateway untuk critical alerts
-- **WhatsApp**: WhatsApp Business API untuk customer support
-
-### 3.5. Integrasi Sistem Eksternal
-
-#### 3.5.1. Payment Gateway
-- **Primary**: Midtrans (local preference)
-- **Secondary**: Xendit (backup dan international)
-- **Tertiary**: Doku (established reliability)
-- **Supported Methods**: Bank Transfer, Credit/Debit Card, E-Wallet (GoPay, OVO, DANA), Virtual Account
-
-#### 3.5.2. Sistem Kesehatan
-- **BPJS API**: Untuk verifikasi kepesertaan dan klaim
-- **Puskesmas Integration**: Data sharing untuk rujukan
-- **Apotek Partnership**: Real-time stock check untuk obat
-- **Telemedicine Platform**: Konsultasi online untuk penghuni
-
-#### 3.5.3. Sistem Pemerintah
-- **Kemensos Integration**: Pelaporan otomatis sesuai format standar
-- **Dukcapil Integration**: Verifikasi NIK dan data penduduk
-- **BPNT Integration**: Koordinasi bantuan sosial
-
-#### 3.5.4. Mapping dan Lokasi
-- **Google Maps API**: Lokasi rumah singgah dan navigasi
-- **Google Places API**: Pencarian lokasi nearby services
-- **Geocoding API**: Konversi alamat ke koordinat
-
-#### 3.5.5. Komunikasi dan Social Media
-- **WhatsApp Business API**: Customer support dan notifications
-- **Facebook Graph API**: Social login dan sharing
-- **Google OAuth**: Single sign-on
-- **Instagram Basic Display**: Gallery integration
+### 3.2 Struktur Folder Laravel
+```
+app/
+├── Http/Controllers/
+│   ├── PublicController.php
+│   ├── PenghuniController.php
+│   ├── PengurusController.php
+│   ├── CMSController.php
+│   ├── NotificationController.php
+│   └── API/
+├── Models/
+│   ├── User.php
+│   ├── Penghuni.php
+│   ├── Pengurus.php
+│   ├── Kamar.php
+│   ├── Piket.php
+│   ├── Donasi.php
+│   ├── Berita.php
+│   └── Notification.php
+├── Services/
+│   ├── WhatsAppService.php
+│   ├── EmailService.php
+│   ├── FileUploadService.php
+│   ├── NotificationService.php
+│   └── CMSService.php
+└── Middleware/
+    ├── PenghuniAuth.php
+    ├── PengurusAuth.php
+    └── AdminOnly.php
+```
 
 ---
 
-## 4. KEBUTUHAN FUNGSIONAL
+## 4. DATABASE DESIGN
 
-### 4.1. Modul Halaman Publik
+### 4.1 Entity Relationship Diagram (ERD)
 
-#### 4.1.1. Company Profile
-- **Deskripsi**: Halaman yang menyajikan informasi comprehensive tentang Rumah Singgah dengan storytelling yang engaging
-- **Input**: N/A (konten dari CMS)
-- **Proses**: Server-side rendering untuk SEO optimal, progressive image loading
-- **Output**: Halaman informasi yang optimized dan accessible
-- **Kriteria Sukses**: Page load < 2s, SEO score 90+, accessibility score AA
+#### 4.1.1 Tabel Users (Pengurus)
+```sql
+CREATE TABLE users (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'pengamat', 'pengambil_keputusan', 'driver') NOT NULL,
+    phone VARCHAR(20),
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+```
 
-**User Stories**:
-1. Sebagai pengunjung, saya ingin mengetahui visi, misi, dan sejarah Rumah Singgah dengan timeline interaktif sehingga saya memahami perjalanan organisasi
-2. Sebagai pengunjung, saya ingin melihat informasi kontak, lokasi dengan maps interaktif, dan jam operasional sehingga saya dapat mengunjungi atau menghubungi
-3. Sebagai pengunjung, saya ingin melihat profil lengkap tim pengurus dengan foto dan latar belakang sehingga saya mengetahui kredibilitas organisasi
-4. Sebagai pengunjung, saya ingin melihat sertifikasi dan penghargaan yang diterima Rumah Singgah untuk membangun trust
-5. Sebagai pengunjung, saya ingin dapat berbagi informasi Rumah Singgah ke social media dengan preview yang menarik
+#### 4.1.2 Tabel Penghuni (Pasien)
+```sql
+CREATE TABLE penghuni (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nomor_pasien VARCHAR(20) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    
+    -- Data Pasien
+    nama_pasien VARCHAR(255) NOT NULL,
+    jenis_kelamin_pasien ENUM('L', 'P') NOT NULL,
+    tanggal_lahir_pasien DATE NOT NULL,
+    nik_pasien VARCHAR(16) NOT NULL,
+    alamat_pasien TEXT NOT NULL,
+    nomor_hp_pasien VARCHAR(20),
+    
+    -- Data Penanggung Jawab
+    nama_penanggung_jawab VARCHAR(255) NOT NULL,
+    jenis_kelamin_pj ENUM('L', 'P') NOT NULL,
+    tanggal_lahir_pj DATE NOT NULL,
+    alamat_pj TEXT NOT NULL,
+    nomor_hp_pj VARCHAR(20) NOT NULL,
+    hubungan_dengan_pasien VARCHAR(100) NOT NULL,
+    is_pendamping_1 BOOLEAN DEFAULT FALSE,
+    
+    -- Data Medis
+    kategori_penyakit VARCHAR(255) NOT NULL,
+    diagnosis_penyakit TEXT NOT NULL,
+    penyakit_menular BOOLEAN DEFAULT FALSE,
+    kelas_bpjs VARCHAR(10),
+    rs_asal VARCHAR(255) NOT NULL,
+    rs_tujuan VARCHAR(255) NOT NULL,
+    pengobatan_rujukan TEXT NOT NULL,
+    rts_tujuan VARCHAR(255),
+    tanggal_masuk DATE,
+    lama_tinggal INT,
+    kondisi_khusus TEXT,
+    
+    -- Status
+    status ENUM('pending', 'active', 'checkout') DEFAULT 'pending',
+    kamar_id BIGINT,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (kamar_id) REFERENCES kamar(id)
+);
+```
 
-#### 4.1.2. Portal Berita dan Agenda
-- **Deskripsi**: Content hub dengan berita, artikel, dan agenda kegiatan dengan sistem engagement
-- **Input**: Search query, filter kategori, pagination parameters
-- **Proses**: Full-text search dengan Elasticsearch, content caching, social sharing tracking
-- **Output**: Daftar konten yang relevan dengan engagement metrics
-- **Kriteria Sukses**: Search response < 500ms, 70% content engagement rate
+#### 4.1.3 Tabel Pendamping
+```sql
+CREATE TABLE pendamping (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    penghuni_id BIGINT NOT NULL,
+    jenis_pendamping ENUM('1', '2') NOT NULL,
+    nama_lengkap VARCHAR(255) NOT NULL,
+    jenis_kelamin ENUM('L', 'P') NOT NULL,
+    tanggal_lahir DATE NOT NULL,
+    alamat TEXT NOT NULL,
+    nomor_hp VARCHAR(20) NOT NULL,
+    hubungan_dengan_pasien VARCHAR(100) NOT NULL,
+    penyakit_menular BOOLEAN DEFAULT FALSE,
+    penyakit_mental BOOLEAN DEFAULT FALSE,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (penghuni_id) REFERENCES penghuni(id) ON DELETE CASCADE
+);
+```
 
-**User Stories**:
-1. Sebagai pengunjung, saya ingin melihat berita terbaru dengan thumbnail yang menarik dan preview snippet
-2. Sebagai pengunjung, saya ingin mencari berita berdasarkan kategori, tag, atau kata kunci dengan filter yang intuitif
-3. Sebagai pengunjung, saya ingin melihat agenda kegiatan dengan kalender interaktif dan reminder option
-4. Sebagai pengunjung, saya ingin dapat comment dan share artikel untuk meningkatkan engagement
-5. Sebagai pengunjung, saya ingin subscribe ke newsletter untuk mendapatkan update terbaru
-6. Sebagai pengunjung, saya ingin melihat related articles dan trending topics
+#### 4.1.4 Tabel Dokumen
+```sql
+CREATE TABLE dokumen (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    penghuni_id BIGINT NOT NULL,
+    jenis_dokumen ENUM('kk', 'bpjs', 'rujukan', 'rekam_medis', 'ktp_pj', 'ktp_p1', 'ktp_p2', 'foto_pasien', 'sktm') NOT NULL,
+    nama_file VARCHAR(255) NOT NULL,
+    path_file VARCHAR(500) NOT NULL,
+    ukuran_file INT,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (penghuni_id) REFERENCES penghuni(id) ON DELETE CASCADE
+);
+```
 
-#### 4.1.3. Galeri Multimedia
-- **Deskripsi**: Media showcase dengan advanced gallery features dan storytelling visual
-- **Input**: Filter kategori, search, sort options
-- **Proses**: Lazy loading, image optimization, CDN delivery, metadata extraction
-- **Output**: Responsive gallery dengan lightbox dan social sharing
-- **Kriteria Sukses**: Image load optimization 80% size reduction, smooth scrolling performance
+#### 4.1.5 Tabel Kamar
+```sql
+CREATE TABLE kamar (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nomor_kamar VARCHAR(10) NOT NULL,
+    kapasitas INT NOT NULL DEFAULT 2,
+    terisi INT NOT NULL DEFAULT 0,
+    jenis_kamar ENUM('pasien_laki', 'pasien_perempuan', 'pendamping') NOT NULL,
+    fasilitas TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+```
 
-**User Stories**:
-1. Sebagai pengunjung, saya ingin melihat foto dan video kegiatan dengan kualitas HD dan loading yang cepat
-2. Sebagai pengunjung, saya ingin dapat filter media berdasarkan tanggal, kegiatan, atau kategori
-3. Sebagai pengunjung, saya ingin dapat download foto untuk keperluan sharing dengan watermark
-4. Sebagai pengunjung, saya ingin melihat slideshow otomatis untuk pengalaman yang immersive
-5. Sebagai pengunjung, saya ingin dapat share individual media ke social media dengan caption yang sudah disiapkan
+#### 4.1.6 Tabel Piket
+```sql
+CREATE TABLE piket (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    penghuni_id BIGINT NOT NULL,
+    tanggal_piket DATE NOT NULL,
+    jenis_piket VARCHAR(100) NOT NULL,
+    status ENUM('scheduled', 'completed', 'skipped') DEFAULT 'scheduled',
+    catatan TEXT,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (penghuni_id) REFERENCES penghuni(id)
+);
+```
 
-#### 4.1.4. Kontak dan Lokasi
-- **Deskripsi**: Comprehensive contact hub dengan multiple communication channels
-- **Input**: Contact form data, location queries, feedback
-- **Proses**: Form validation, spam protection, auto-response, ticket creation
-- **Output**: Contact information, interactive map, form submission confirmation
-- **Kriteria Sukses**: Form submission success rate 95%, response time to inquiries < 24 hours
+#### 4.1.7 Tabel Histori Berobat
+```sql
+CREATE TABLE histori_berobat (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    penghuni_id BIGINT NOT NULL,
+    tanggal_berobat DATE NOT NULL,
+    rumah_sakit VARCHAR(255) NOT NULL,
+    jenis_pengobatan VARCHAR(255) NOT NULL,
+    hasil_pengobatan TEXT,
+    catatan TEXT,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (penghuni_id) REFERENCES penghuni(id)
+);
+```
 
-**User Stories**:
-1. Sebagai pengunjung, saya ingin melihat alamat lengkap dengan Google Maps integration dan directions
-2. Sebagai pengunjung, saya ingin dapat mengirim pesan melalui form kontak dengan tracking status
-3. Sebagai pengunjung, saya ingin melihat multiple cara menghubungi (telepon, email, WhatsApp, social media)
-4. Sebagai pengunjung, saya ingin melihat jam operasional dan informasi ketersediaan real-time
-5. Sebagai pengunjung, saya ingin dapat melakukan appointment booking untuk kunjungan
-6. Sebagai pengunjung, saya ingin mendapatkan auto-reply dengan estimated response time
+#### 4.1.8 Tabel Jadwal Kunjungan
+```sql
+CREATE TABLE jadwal_kunjungan (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    penghuni_id BIGINT NOT NULL,
+    driver_id BIGINT,
+    tanggal_kunjungan DATE NOT NULL,
+    waktu_berangkat TIME NOT NULL,
+    rumah_sakit VARCHAR(255) NOT NULL,
+    keperluan TEXT NOT NULL,
+    status ENUM('pending', 'approved', 'on_progress', 'completed', 'cancelled') DEFAULT 'pending',
+    kloter VARCHAR(10),
+    catatan TEXT,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (penghuni_id) REFERENCES penghuni(id),
+    FOREIGN KEY (driver_id) REFERENCES users(id)
+);
+```
 
-### 4.2. Modul Sistem Donasi
+#### 4.1.9 Tabel Donasi
+```sql
+CREATE TABLE donasi (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    nama_donatur VARCHAR(255) NOT NULL,
+    email_donatur VARCHAR(255),
+    nomor_hp_donatur VARCHAR(20),
+    jumlah_donasi DECIMAL(15,2) NOT NULL,
+    jenis_donasi ENUM('uang', 'barang') NOT NULL,
+    deskripsi_donasi TEXT,
+    status ENUM('pending', 'confirmed', 'received') DEFAULT 'pending',
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP
+);
+```
 
-#### 4.2.1. Pendaftaran dan Manajemen Donatur
-- **Deskripsi**: Comprehensive donor management dengan KYC dan engagement tracking
-- **Input**: Personal data, verification documents, preferences
-- **Proses**: Multi-step registration, email/SMS verification, KYC validation, profile building
-- **Output**: Verified donor account dengan personalized dashboard
-- **Kriteria Sukses**: Registration completion rate 85%, verification success rate 90%
+#### 4.1.10 Tabel Berita
+```sql
+CREATE TABLE berita (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    judul VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    konten LONGTEXT NOT NULL,
+    gambar_utama VARCHAR(500),
+    excerpt TEXT,
+    status ENUM('draft', 'published') DEFAULT 'draft',
+    author_id BIGINT NOT NULL,
+    views INT DEFAULT 0,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+```
 
-**User Stories**:
-1. Sebagai calon donatur, saya ingin mendaftar dengan cepat menggunakan email, phone, atau social login
-2. Sebagai calon donatur, saya ingin melakukan verifikasi identitas yang mudah dan aman
-3. Sebagai donatur, saya ingin mengatur preferensi donasi dan notification settings
-4. Sebagai donatur, saya ingin dapat mengupdate profil dan informasi kontak
-5. Sebagai donatur, saya ingin melihat donation history dan tax benefits
-6. Sebagai donatur, saya ingin dapat mengundang teman untuk bergabung dengan referral program
+#### 4.1.11 Tabel Notifications
+```sql
+CREATE TABLE notifications (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    user_id BIGINT NOT NULL,
+    user_type ENUM('penghuni', 'pengurus') NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    type ENUM('info', 'warning', 'success', 'danger') DEFAULT 'info',
+    action_url VARCHAR(500),
+    is_read BOOLEAN DEFAULT FALSE,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    INDEX idx_user_notifications (user_id, user_type, is_read),
+    INDEX idx_created_at (created_at)
+);
+```
 
-#### 4.2.2. Sistem Donasi Uang Advanced
-- **Deskripsi**: Sophisticated financial donation system dengan multiple scenarios
-- **Input**: Donation amount, payment method, campaign selection, recurring options
-- **Proses**: Amount validation, payment processing, receipt generation, impact calculation
-- **Output**: Payment confirmation, digital receipt, impact report preview
-- **Kriteria Sukses**: Payment success rate 98%, average donation completion time < 3 minutes
+#### 4.1.12 Tabel Registration Steps (untuk upload bertahap)
+```sql
+CREATE TABLE registration_steps (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    session_id VARCHAR(255) NOT NULL,
+    penghuni_id BIGINT,
+    current_step INT DEFAULT 1,
+    step_1_completed BOOLEAN DEFAULT FALSE,
+    step_2_completed BOOLEAN DEFAULT FALSE,
+    step_3_completed BOOLEAN DEFAULT FALSE,
+    temp_data JSON,
+    expires_at TIMESTAMP,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (penghuni_id) REFERENCES penghuni(id) ON DELETE CASCADE,
+    INDEX idx_session (session_id),
+    INDEX idx_expires (expires_at)
+);
+```
 
-**User Stories**:
-1. Sebagai donatur, saya ingin memilih dari preset amounts atau input custom amount dengan suggestions
-2. Sebagai donatur, saya ingin memilih campaign specific atau unrestricted donation
-3. Sebagai donatur, saya ingin setup recurring donation dengan flexible schedule
-4. Sebagai donatur, saya ingin melihat real-time impact calculation dari donasi saya
-5. Sebagai donatur, saya ingin menerima instant receipt dan tax deduction certificate
-6. Sebagai donatur, saya ingin dapat donate secara anonymous atau with public recognition
-7. Sebagai donatur, saya ingin dapat memorial donation untuk orang tercinta
-8. Sebagai donatur, saya ingin melihat matching gift opportunities dari employer
+#### 4.1.13 Tabel Berita (Updated dengan SEO)
+```sql
+CREATE TABLE berita (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    judul VARCHAR(255) NOT NULL,
+    slug VARCHAR(255) UNIQUE NOT NULL,
+    konten LONGTEXT NOT NULL,
+    excerpt TEXT,
+    gambar_utama VARCHAR(500),
+    gambar_gallery JSON, -- Multiple images
+    
+    -- SEO Fields
+    meta_title VARCHAR(255),
+    meta_description TEXT,
+    meta_keywords VARCHAR(500),
+    
+    -- Publishing
+    status ENUM('draft', 'published', 'scheduled') DEFAULT 'draft',
+    published_at TIMESTAMP NULL,
+    scheduled_at TIMESTAMP NULL,
+    
+    -- Author & Stats
+    author_id BIGINT NOT NULL,
+    views INT DEFAULT 0,
+    featured BOOLEAN DEFAULT FALSE,
+    allow_comments BOOLEAN DEFAULT TRUE,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    FOREIGN KEY (author_id) REFERENCES users(id),
+    INDEX idx_status_published (status, published_at),
+    INDEX idx_featured (featured),
+    FULLTEXT(judul, konten, excerpt)
+);
+```
 
-#### 4.2.3. Sistem Donasi Barang Terintegrasi
-- **Deskripsi**: Complete in-kind donation management dengan inventory integration
-- **Input**: Item details, photos, condition, quantity, pickup/delivery preferences
-- **Proses**: Item validation, photo processing, scheduling, inventory matching, approval workflow
-- **Output**: Donation confirmation, pickup schedule, impact tracking
-- **Kriteria Sukses**: Item acceptance rate 80%, pickup schedule adherence 95%
+#### 4.1.14 Tabel Newsletter Subscribers (Updated)
+```sql
+CREATE TABLE newsletter_subscribers (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    name VARCHAR(255),
+    is_active BOOLEAN DEFAULT TRUE,
+    preferences JSON, -- Preference jenis berita
+    last_sent_at TIMESTAMP NULL,
+    
+    created_at TIMESTAMP,
+    updated_at TIMESTAMP,
+    
+    INDEX idx_active_subscribers (is_active, created_at)
+);
+```
 
-**User Stories**:
-1. Sebagai donatur, saya ingin melihat most needed items list dengan priority levels
-2. Sebagai donatur, saya ingin upload foto dan deskripsi barang dengan guided form
-3. Sebagai donatur, saya ingin memilih delivery method (pickup, drop-off, courier)
-4. Sebagai donatur, saya ingin mendapatkan pre-approval sebelum final commitment
-5. Sebagai donatur, saya ingin tracking status dari pickup hingga distribution
-6. Sebagai donatur, saya ingin melihat impact story dari barang yang saya donasikan
-7. Sebagai donatur, saya ingin dapat batch donation untuk multiple items
-8. Sebagai donatur, saya ingin mendapatkan tax deduction valuation untuk barang
+---
 
-#### 4.2.4. Dashboard Donatur Personal
-- **Deskripsi**: Personalized donor portal dengan comprehensive analytics dan engagement tools
-- **Input**: Dashboard preferences, filter options, date ranges
-- **Proses**: Data aggregation, impact calculation, story matching, recommendation engine
-- **Output**: Personalized dashboard dengan actionable insights
-- **Kriteria Sukses**: Daily active users 40%, average session duration 5+ minutes
+## 5. API ENDPOINTS
 
-**User Stories**:
-1. Sebagai donatur, saya ingin melihat donation summary dengan visual charts dan trends
-2. Sebagai donatur, saya ingin melihat personalized impact stories dari donasi saya
-3. Sebagai donatur, saya ingin mendapatkan recommendation untuk donasi selanjutnya
-4. Sebagai donatur, saya ingin melihat milestone achievements dan recognition badges
-5. Sebagai donatur, saya ingin dapat set dan track personal giving goals
-6. Sebagai donatur, saya ingin melihat thank you messages dan updates dari penerima
-7. Sebagai donatur, saya ingin dapat invite friends dan track referral impact
-8. Sebagai donatur, saya ingin export data untuk personal tax filing
+### 5.1 Public API (Pengunjung/Donatur)
+```
+GET    /api/berita                    - List berita published
+GET    /api/berita/{slug}             - Detail berita
+GET    /api/statistik                 - Statistik penghuni (anonymous)
+POST   /api/donasi                    - Submit donasi
+POST   /api/newsletter/subscribe      - Subscribe newsletter
+GET    /api/company-profile           - Info company profile
+```
 
-#### 4.2.5. Crowdfunding dan Campaign Management
-- **Deskripsi**: Campaign-based fundraising dengan social sharing dan milestone tracking
-- **Input**: Campaign search, filter, social sharing data
-- **Proses**: Campaign matching, progress tracking, social amplification, milestone notifications
-- **Output**: Campaign listings, progress visualization, sharing analytics
-- **Kriteria Sukses**: Campaign completion rate 70%, social sharing rate 30%
+### 5.2 Penghuni API
+```
+POST   /api/penghuni/register/step1    - Step 1: Data Pasien & PJ
+POST   /api/penghuni/register/step2    - Step 2: Data Medis
+POST   /api/penghuni/register/step3    - Step 3: Data Pendamping
+POST   /api/penghuni/register/upload   - Upload dokumen bertahap
+POST   /api/penghuni/register/submit   - Submit final registrasi
+GET    /api/penghuni/register/status   - Cek status registrasi
+POST   /api/penghuni/login             - Login penghuni
+GET    /api/penghuni/dashboard         - Dashboard data
+GET    /api/penghuni/profile           - Profile lengkap
+GET    /api/penghuni/notifications     - Notifikasi in-app
+PUT    /api/penghuni/notifications/{id}/read - Mark notification as read
+GET    /api/penghuni/pengumuman        - List pengumuman
+GET    /api/penghuni/piket             - Jadwal piket
+POST   /api/penghuni/histori-berobat   - Input histori berobat
+POST   /api/penghuni/jadwal-kunjungan  - Request jadwal kunjungan
+POST   /api/penghuni/lapor-piket       - Lapor selesai piket
+POST   /api/penghuni/checkout          - Proses checkout
+```
 
-**User Stories**:
-1. Sebagai donatur, saya ingin melihat active campaigns dengan compelling stories dan clear goals
-2. Sebagai donatur, saya ingin tracking campaign progress dengan real-time updates
-3. Sebagai donatur, saya ingin share campaigns ke social media dengan personalized message
-4. Sebagai donatur, saya ingin melihat leaderboard dan social proof dari donors lain
-5. Sebagai donatur, saya ingin mendapatkan milestone notifications dan celebrate achievements
-6. Sebagai donatur, saya ingin dapat create peer-to-peer fundraising campaign
-7. Sebagai donatur, saya ingin melihat campaign impact report setelah completion
+### 5.3 Pengurus API
+```
+POST   /api/pengurus/login             - Login pengurus
+GET    /api/pengurus/dashboard         - Dashboard statistik
+GET    /api/pengurus/notifications     - Notifikasi in-app
+PUT    /api/pengurus/notifications/{id}/read - Mark notification as read
+GET    /api/pengurus/penghuni          - List semua penghuni
+GET    /api/pengurus/penghuni/{id}     - Detail penghuni
+PUT    /api/pengurus/penghuni/{id}     - Update data penghuni
+GET    /api/pengurus/kamar             - Manajemen kamar
+POST   /api/pengurus/assign-kamar      - Assign penghuni ke kamar
+GET    /api/pengurus/piket             - Manajemen piket
+POST   /api/pengurus/create-piket      - Buat jadwal piket
+GET    /api/pengurus/jadwal-kunjungan  - List jadwal kunjungan
+PUT    /api/pengurus/approve-kunjungan - Approve jadwal kunjungan
+POST   /api/pengurus/send-whatsapp     - Kirim pesan WhatsApp
+```
 
-#### 4.2.6. Sistem Pelaporan dan Transparansi
-- **Deskripsi**: Comprehensive reporting system untuk accountability dan trust building
-- **Input**: Report parameters, date ranges, export preferences
-- **Proses**: Data aggregation, report generation, compliance checking, audit trail
-- **Output**: Financial reports, impact reports, tax documents, audit files
-- **Kriteria Sukses**: Report accuracy 99.9%, generation time < 30 seconds
+### 5.4 CMS API (Admin Only)
+```
+GET    /api/cms/berita                 - List semua berita (draft/published)
+GET    /api/cms/berita/{id}            - Detail berita untuk edit
+POST   /api/cms/berita                 - Create berita baru
+PUT    /api/cms/berita/{id}            - Update berita
+DELETE /api/cms/berita/{id}            - Delete berita
+POST   /api/cms/berita/{id}/publish    - Publish berita
+POST   /api/cms/berita/{id}/unpublish  - Unpublish berita
+POST   /api/cms/berita/{id}/schedule   - Schedule publish berita
+POST   /api/cms/upload-image           - Upload gambar untuk berita
+GET    /api/cms/media                  - Media library
+DELETE /api/cms/media/{id}             - Delete media
+GET    /api/cms/analytics              - Berita analytics (views, etc)
+```
 
-**User Stories**:
-1. Sebagai donatur, saya ingin melihat financial transparency report dengan breakdown penggunaan dana
-2. Sebagai donatur, saya ingin download tax-compliant donation receipts untuk filing
-3. Sebagai donatur, saya ingin melihat quarterly impact reports dengan stories dan metrics
-4. Sebagai pengurus, saya ingin generate compliance reports untuk government submission
-5. Sebagai pengurus, saya ingin automated monthly financial reports dengan variance analysis
-6. Sebagai auditor, saya ingin akses ke audit trail dan supporting documents
+### 5.5 Notification API
+```
+GET    /api/notifications              - Get user notifications
+POST   /api/notifications/mark-read    - Mark multiple as read
+GET    /api/notifications/count        - Unread count
+POST   /api/notifications/send         - Send notification (admin)
+```
 
-### 4.3. Modul Penghuni (Internal)
+---
 
-#### 4.3.1. Sistem Autentikasi dan Profil Penghuni
-- **Deskripsi**: Secure authentication dengan comprehensive profile management
-- **Input**: Login credentials, biometric data (optional), profile information
-- **Proses**: Multi-factor authentication, session management, profile validation
-- **Output**: Authenticated session, personalized profile dashboard
-- **Kriteria Sukses**: Login success rate 99%, profile completion rate 90%
+## 6. WORKFLOW SISTEM
 
-**User Stories**:
-1. Sebagai penghuni, saya ingin login dengan mudah menggunakan username/password atau biometric
-2. Sebagai penghuni, saya ingin dapat update profil personal dengan foto dan informasi terkini
-3. Sebagai penghuni, saya ingin setup emergency contacts dan medical information
-4. Sebagai penghuni, saya ingin privacy controls untuk menentukan data apa yang visible
-5. Sebagai penghuni, saya ingin dapat reset password dengan security questions atau SMS
-6. Sebagai penghuni, saya ingin session timeout yang reasonable untuk security
+### 6.1 Workflow Registrasi Penghuni (Bertahap)
+**Step 1: Data Dasar Pasien & Penanggung Jawab**
+1. Penghuni mengisi data pasien (nama, NIK, alamat, dll)
+2. Data penanggung jawab dan hubungan keluarga
+3. Sistem simpan di `registration_steps` table sebagai temp data
+4. Generate session ID untuk tracking progress
 
-#### 4.3.2. Portal Informasi dan Komunikasi Penghuni
-- **Deskripsi**: Centralized information hub dengan real-time communication
-- **Input**: Message composition, information requests, feedback
-- **Proses**: Content filtering, real-time messaging, notification routing
-- **Output**: Organized information feed, conversation threads, notifications
-- **Kriteria Sukses**: Information engagement rate 80%, response time < 2 hours
+**Step 2: Data Medis & Rujukan**
+1. Input kategori penyakit dan diagnosis detail
+2. Data BPJS, RS asal, RS tujuan
+3. Rencana pengobatan dan kondisi khusus
+4. Update progress di database temp
 
-**User Stories**:
-1. Sebagai penghuni, saya ingin melihat announcement dan updates penting dari pengurus
-2. Sebagai penghuni, saya ingin melihat daily schedule dan upcoming activities
-3. Sebagai penghuni, saya ingin dapat mengirim private messages ke pengurus
-4. Sebagai penghuni, saya ingin join group discussions dan community boards
-5. Sebagai penghuni, saya ingin mendapatkan push notifications untuk urgent information
-6. Sebagai penghuni, saya ingin dapat request help atau report issues
-7. Sebagai penghuni, saya ingin akses ke resource library (forms, guides, contacts)
+**Step 3: Data Pendamping & Upload Dokumen**
+1. Input data pendamping 1 & 2 (opsional)
+2. Upload dokumen bertahap dengan progress bar:
+   - KK, BPJS, Surat Rujukan (wajib)
+   - Rekam medis, KTP-KTP (wajib)
+   - Foto pasien, SKTM (wajib)
+3. Validasi semua dokumen ter-upload
+4. Generate Nomor Pasien otomatis & set password
+5. Transfer data temp ke tabel penghuni
+6. Status "pending" menunggu approval pengurus
+7. **Auto-notify pengurus** via in-app notification
+8. Konfirmasi registrasi via WhatsApp & Email
 
-#### 4.3.3. Sistem Check-in/Check-out Advanced
-- **Deskripsi**: Sophisticated occupancy management dengan biometric dan geofencing
-- **Input**: Check-in/out requests, location data, biometric verification, duration estimates
-- **Proses**: Location verification, capacity checking, document generation, notification dispatch
-- **Output**: Check-in/out confirmation, occupancy certificates, notifications to stakeholders
-- **Kriteria Sukses**: Check-in accuracy 99%, processing time < 2 minutes
+**Approval Process:**
+1. Pengurus review data via dashboard
+2. Approve/reject dengan catatan
+3. Jika approve: assign kamar + status "active"
+4. **In-app notification** ke penghuni tentang hasil approval
 
-**User Stories**:
-1. Sebagai penghuni baru, saya ingin melakukan check-in dengan guided onboarding process
-2. Sebagai penghuni, saya ingin dapat temporary check-out untuk appointments atau work
-3. Sebagai penghuni, saya ingin melihat remaining duration dan renewal options
-4. Sebagai penghuni, saya ingin dapat request extension dengan justification
-5. Sebagai penghuni, saya ingin smooth check-out process dengan feedback collection
-6. Sebagai penghuni, saya ingin dapat emergency check-in jika returning late
-7. Sebagai pengurus, saya ingin real-time occupancy monitoring dan alerts
+### 6.2 Workflow CMS Berita
+**Create & Publish Berita:**
+1. Admin login ke CMS dashboard
+2. Create berita baru dengan rich text editor
+3. Upload gambar utama + gallery images
+4. Set SEO meta (title, description, keywords)
+5. Pilih status: Draft / Publish Now / Schedule Publish
+6. Preview sebelum publish
+7. Saat publish: **auto-notify newsletter subscribers**
+8. Berita tampil di homepage public secara otomatis
 
-#### 4.3.4. Sistem Kesehatan Terintegrasi
-- **Deskripsi**: Comprehensive health management dengan telemedicine integration
+**Auto-Update Homepage:**
+1. Homepage menampilkan 3 berita terbaru dengan featured image
+2. Real-time update saat ada berita baru dipublish
+3. SEO-friendly URLs dengan slug
+4. Breadcrumb navigation untuk detail berita
+
+### 6.3 Workflow Notifikasi In-App
+**Real-time Notifications:**
+1. Sistem generate notifikasi untuk berbagai event:
+   - Penghuni: approval status, jadwal piket, reminder
+   - Pengurus: registrasi baru, request kunjungan, laporan piket
+2. Notifikasi tersimpan di database dengan status unread
+3. Real-time push via WebSocket/Server-Sent Events
+4. Badge counter di navigation bar
+5. Mark as read individual atau bulk
+6. Auto-cleanup notifikasi lama (>30 hari)
+
+### 6.2 Workflow Jadwal Kunjungan
+1. Penghuni request jadwal kunjungan via dashboard
+2. Sistem mengirim notifikasi ke pengurus (driver)
+3. Driver approve dan set kloter
+4. Sistem update status dan notifikasi penghuni
+5. Driver pickup sesuai jadwal
+6. Update status "on_progress" → "completed"
+
+### 6.3 Workflow Donasi
+1. Visitor mengisi form donasi tanpa registrasi
+2. Sistem generate kode donasi unik
+3. Kirim konfirmasi via WhatsApp & Email
+4. Include instruksi transfer/delivery (jika barang)
+5. Pengurus konfirmasi penerimaan donasi
+6. Update status donasi
+
+---
+
+## 7. SECURITY CONSIDERATIONS
+
+### 7.1 Data Protection
+- Enkripsi data sensitif (NIK, nomor HP, data medis)
+- Hash password menggunakan bcrypt
+- Validasi file upload (type, size, virus scan)
+- Sanitasi input untuk mencegah XSS/SQL Injection
+
+### 7.2 Authentication & Authorization
+- JWT token untuk API authentication
+- Role-based access control (RBAC)
+- Session timeout untuk keamanan
+- Rate limiting untuk mencegah brute force
+
+### 7.3 File Upload Security
+- Validasi ekstensi file yang diizinkan (.jpg, .jpeg, .png, .pdf)
+- Maksimal ukuran file 5MB per dokumen
+- Rename file dengan hash untuk mencegah direct access
+- Store di folder non-public dengan proper permissions
+
+---
+
+## 8. INTEGRATION SERVICES
+
+### 8.1 WhatsApp API Integration
+```php
+// WhatsAppService.php
+class WhatsAppService
+{
+    public function sendMessage($phone, $message)
+    {
+        // Integration dengan WhatsApp Business API
+        // Atau alternatif: Twilio, Vonage, dll
+    }
+    
+    public function sendDonationConfirmation($phone, $donationData) {}
+    public function sendCheckInNotification($phone, $penghuniData) {}
+    public function sendScheduleReminder($phone, $scheduleData) {}
+}
+```
+
+### 8.3 Real-time Notification Service
+```php
+// NotificationService.php
+class NotificationService
+{
+    public function sendToUser($userId, $userType, $title, $message, $type = 'info', $actionUrl = null)
+    {
+        // Save to database
+        $notification = Notification::create([
+            'user_id' => $userId,
+            'user_type' => $userType,
+            'title' => $title,
+            'message' => $message,
+            'type' => $type,
+            'action_url' => $actionUrl
+        ]);
+        
+        // Send real-time via WebSocket/SSE
+        $this->broadcastNotification($notification);
+        
+        return $notification;
+    }
+    
+    public function notifyNewRegistration($penghuniData) 
+    {
+        // Notify all pengurus about new registration
+        $pengurus = User::where('role', '!=', 'admin')->get();
+        foreach ($pengurus as $user) {
+            $this->sendToUser(
+                $user->id, 
+                'pengurus',
+                'Pendaftaran Baru',
+                "Penghuni baru: {$penghuniData['nama_pasien']} menunggu approval",
+                'info',
+                "/pengurus/penghuni/{$penghuniData['id']}"
+            );
+        }
+    }
+    
+    public function notifyApprovalResult($penghuniId, $approved, $notes = null) {}
+    public function notifyPiketReminder($penghuniId, $piketData) {}
+    public function notifyScheduleRequest($driverId, $scheduleData) {}
+}
+```
+
+### 8.4 CMS Service
+```php
+// CMSService.php
+class CMSService
+{
+    public function publishBerita($beritaId)
+    {
+        $berita = Berita::findOrFail($beritaId);
+        $berita->update([
+            'status' => 'published',
+            'published_at' => now()
+        ]);
+        
+        // Auto-notify newsletter subscribers
+        $this->notifySubscribers($berita);
+        
+        // Update homepage cache
+        $this->updateHomepageCache();
+        
+        return $berita;
+    }
+    
+    public function scheduleBerita($beritaId, $scheduledAt)
+    {
+        $berita = Berita::findOrFail($beritaId);
+        $berita->update([
+            'status' => 'scheduled',
+            'scheduled_at' => $scheduledAt
+        ]);
+        
+        // Add to queue for scheduled publishing
+        PublishScheduledBerita::dispatch($berita)->delay($scheduledAt);
+        
+        return $berita;
+    }
+    
+    private function notifySubscribers($berita)
+    {
+        $subscribers = NewsletterSubscriber::where('is_active', true)->get();
+        foreach ($subscribers as $subscriber) {
+            SendNewsletterEmail::dispatch($subscriber, $berita);
+        }
+    }
+    
+    public function getBeritaForHomepage($limit = 3)
+    {
+        return Berita::where('status', 'published')
+                    ->orderBy('featured', 'DESC')
+                    ->orderBy('published_at', 'DESC')
+                    ->limit($limit)
+                    ->get();
+    }
+}
+```
+
+---
+
+## 9. DEPLOYMENT PLAN
+
+### 9.1 Shared Hosting Setup (Hostinger)
+1. **Domain & SSL**: Setup domain dengan SSL certificate
+2. **Database**: Create MySQL database dan user
+3. **File Structure**: Upload Laravel files ke public_html
+4. **Environment**: Configure .env untuk production
+5. **Cron Jobs**: Setup untuk queue jobs dan scheduled tasks
+
+### 9.2 Environment Configuration
+```env
+APP_NAME="Rumah Singgah Pasien Anak"
+APP_ENV=production
+APP_KEY=base64:...
+APP_DEBUG=false
+APP_URL=https://yourdomai n.com
+
+DB_CONNECTION=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=your_db_name
+DB_USERNAME=your_db_user
+DB_PASSWORD=your_db_password
+
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.hostinger.com
+MAIL_PORT=587
+MAIL_USERNAME=your_email
+MAIL_PASSWORD=your_password
+
+WHATSAPP_API_KEY=your_whatsapp_api_key
+WHATSAPP_API_URL=https://api.whatsapp.com/
+```
+
+### 9.3 Performance Optimization
+- **Caching**: Redis/Memcached untuk session dan cache
+- **CDN**: CloudFlare untuk static assets
+- **Image Optimization**: Compress uploaded images
+- **Database Indexing**: Proper indexing untuk query performance
+
+---
+
+## 10. TESTING STRATEGY
+
+### 10.1 Unit Testing
+- Model validation testing
+- Service class testing
+- API endpoint testing
+
+### 10.2 Integration Testing
+- WhatsApp API integration
+- Email service integration
+- File upload functionality
+
+### 10.3 User Acceptance Testing
+- Test dengan pengurus untuk workflow approval
+- Test dengan sample penghuni untuk registrasi
+- Test performa dengan data dummy
+
+---
+
+## 11. MAINTENANCE PLAN
+
+### 11.1 Regular Maintenance
+- Daily: Database backup
+- Weekly: Log file cleanup
+- Monthly: Performance monitoring
+- Quarterly: Security audit
+
+### 11.2 Monitoring
+- Server uptime monitoring
+- Database performance monitoring
+- API response time monitoring
+- Error logging dan alerting
+
+---
+
+## 12. TIMELINE ESTIMASI
+
+### Phase 1: Core Development (5-7 minggu)
+- Setup Laravel dan database schema lengkap
+- Implementasi authentication system multi-role
+- **Step-by-step registration system** dengan temp storage
+- CRUD basic untuk semua entitas
+- **Real-time notification system** (WebSocket/SSE)
+- Integration WhatsApp & Email basic
+
+### Phase 2: Advanced Features (4-5 minggu)
+- **File upload system bertahap** dengan progress tracking
+- **CMS berita lengkap** dengan rich text editor
+- Complex workflow (approval, assignment, scheduling)
+- Dashboard dan reporting dengan charts
+- **In-app notification** real-time di frontend
+- **Auto-publish homepage** saat ada berita baru
+
+### Phase 3: Frontend Integration (3-4 minggu)
+- Integration existing frontend dengan Laravel API
+- **Responsive notification UI** dengan badge counter
+- **CMS interface** untuk admin kelola berita
+- **Registration wizard UI** yang user-friendly
+- Mobile optimization untuk semua fitur
+
+### Phase 4: Testing & Deployment (2-3 minggu)
+- Unit testing dan integration testing
+- User acceptance testing dengan real data
+- Performance optimization (caching, indexing)
+- Production deployment dengan monitoring
+
+### Phase 5: Post-Launch Support (ongoing)
+- Real-time monitoring dan maintenance
+- User training untuk pengurus
+- Feature enhancement berdasarkan feedback
+- **Content management training** untuk admin
+
+---
+
+## 13. CATATAN TAMBAHAN
+
+### 13.1 Saran Improvement
+1. **Progressive Web App (PWA)**: Untuk better mobile experience + offline capability
+2. **Real-time Chat System**: Direct chat antara penghuni dan pengurus
+3. **Push Notifications**: Browser push notifications untuk desktop
+4. **Advanced Analytics**: Dashboard analytics untuk website traffic dan user behavior
+5. **Multi-language Support**: Bahasa daerah untuk penghuni dari berbagai wilayah
+6. **QR Code Integration**: QR code untuk check-in/check-out yang lebih cepat
+7. **Automated Reporting**: Auto-generate laporan bulanan untuk stakeholder
+8. **Mobile App**: Native mobile app untuk better user experience
+
+### 13.2 Technical Enhancements
+1. **Caching Strategy**: Redis untuk session, cache berita, dan query optimization
+2. **Image Optimization**: Auto-compress dan resize uploaded images
+3. **SEO Optimization**: Full SEO untuk halaman berita dan company profile
+4. **API Rate Limiting**: Prevent abuse dengan rate limiting per user
+5. **Audit Trail**: Log semua aktivitas penting untuk compliance
+6. **Database Indexing**: Optimize query performance dengan proper indexing
+7. **Content Delivery Network**: CloudFlare atau AWS CloudFront untuk static assets
+8. **Backup Automation**: Daily automated backup ke cloud storage
+
+### 13.3 User Experience Improvements
+1. **Dark Mode**: Option dark/light mode untuk better accessibility
+2. **Keyboard Shortcuts**: Shortcuts untuk power users (pengurus)
+3. **Bulk Operations**: Bulk actions untuk manajemen data yang lebih efisien
+4. **Advanced Search**: Full-text search untuk berita dan data penghuni
+5. **Export Functions**: Export data ke Excel/PDF untuk reporting
+6. **Calendar Integration**: Sync jadwal dengan Google Calendar
+7. **Drag & Drop**: Drag & drop untuk upload dokumen dan manage assignments
+8. **Real-time Collaboration**: Multiple pengurus bisa edit data bersamaan
+
+### 13.2 Scalability Considerations
+- Jika penghuni > 100: Consider VPS upgrade
+- Implement queue system untuk heavy operations
+- Database partitioning untuk historical data
+- CDN untuk file/image serving
+
+### 13.3 Compliance
+- GDPR compliance untuk data protection
+- Healthcare data privacy regulations
+- Regular security auditing
+- Data retention policy
+
+---
+
+**Dokumen ini adalah living document yang akan diupdate sesuai kebutuhan dan feedback selama development process.**
