@@ -1050,8 +1050,10 @@ About Us Style
   margin-right: 25px;
 }
 
+
 .about-us .services .item .icon img {
   max-width: 70px;
+  border-radius: 50px;
 }
 
 .about-us .services .item h4 {
